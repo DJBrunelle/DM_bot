@@ -2,8 +2,11 @@ package bot
 
 import (
 	"DM_bot/config"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -12,9 +15,15 @@ import (
 
 var botID string
 var goBot *discordgo.Session
+var yesOrNoVal *yesNoStruct
 
 const nolan = "GutsmansAss"
 const daniel = "iel"
+
+type yesNoStruct struct {
+	Answer string `json:"answer"`
+	Image  string `json:"image"`
+}
 
 //Start runs the gobot
 func Start() {
@@ -84,14 +93,107 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+	if strings.HasSuffix(m.Content, "?") {
+		answer, image := yesOrNo()
+		_, _ = s.ChannelMessageSend(m.ChannelID, answer)
+		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+	}
+
+	if strings.Contains(strings.ToLower(m.Content), "yes") || strings.Contains(strings.ToLower(m.Content), "ya") {
+		image := yes()
+		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+	}
+
+	if strings.Contains(strings.ToLower(m.Content), "no") || strings.Contains(strings.ToLower(m.Content), "nah") {
+		image := no()
+		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+	}
+
+	if strings.Contains(strings.ToLower(m.Content), "maybe") {
+		image := maybe()
+		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+	}
+
 }
 
 func help() string {
-	return "!ping - command to check if bot is active\nroll n - rolls an n sided dice for user"
+	return "!ping - command to check if bot is active\nroll n - rolls an n sided dice for user\nyes/no/maybe - sends a gif based on command\n ? - sends random yes no maybe answer"
 
 }
 
 //roll an n sided dice
 func roll(n int) int {
 	return rand.Intn(n) + 1
+}
+
+func yesOrNo() (string, string) {
+	response, err := http.Get("https://yesno.wtf/api")
+
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+		return "", ""
+	}
+	data, _ := ioutil.ReadAll(response.Body)
+
+	err = json.Unmarshal(data, &yesOrNoVal)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", ""
+	}
+	return yesOrNoVal.Answer, yesOrNoVal.Image
+}
+
+func yes() string {
+	response, err := http.Get("https://yesno.wtf/api?force=yes")
+
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+		return ""
+	}
+	data, _ := ioutil.ReadAll(response.Body)
+
+	err = json.Unmarshal(data, &yesOrNoVal)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	return yesOrNoVal.Image
+}
+
+func no() string {
+	response, err := http.Get("https://yesno.wtf/api?force=no")
+
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+		return ""
+	}
+	data, _ := ioutil.ReadAll(response.Body)
+
+	err = json.Unmarshal(data, &yesOrNoVal)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	return yesOrNoVal.Image
+}
+
+func maybe() string {
+	response, err := http.Get("https://yesno.wtf/api?force=maybe")
+
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+		return ""
+	}
+	data, _ := ioutil.ReadAll(response.Body)
+
+	err = json.Unmarshal(data, &yesOrNoVal)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	return yesOrNoVal.Image
 }
