@@ -2,6 +2,7 @@ package bot
 
 import (
 	"DM_bot/api/answer"
+	"DM_bot/api/insult"
 	"DM_bot/config"
 	"fmt"
 	"math/rand"
@@ -11,20 +12,24 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var botID string
-var goBot *discordgo.Session
-var yesOrNoVal *yesNoStruct
-
-const nolan = "135923889795497984"
-const daniel = "196128092874342401"
-const cel = "92086825551687680"
-const derek = "90648400776671232"
-const nino = "91360391333945344"
-const han = "137690439909113856"
-const sarah = "108729905713303552"
-const twysper = "90967921043451904"
-const david = "217053054699175936"
-const benji = "90968733580820480"
+var (
+	botID      string
+	goBot      *discordgo.Session
+	yesOrNoVal *yesNoStruct
+	users      = map[string]string{
+		"nolan":   "135923889795497984",
+		"daniel":  "196128092874342401",
+		"cel":     "92086825551687680",
+		"derek":   "90648400776671232",
+		"nino":    "91360391333945344",
+		"han":     "137690439909113856",
+		"sarah":   "108729905713303552",
+		"twysper": "90967921043451904",
+		"david":   "217053054699175936",
+		"benji":   "90968733580820480",
+		"shawn":   "122520927689900033",
+	}
+)
 
 type yesNoStruct struct {
 	Answer string `json:"answer"`
@@ -68,34 +73,38 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	//Static bot responses
 	if strings.HasPrefix(m.Content, config.BotPrefix) {
-		if m.Content == "!help" {
-			_, _ = s.ChannelMessageSend(m.ChannelID, help())
-		}
-		//ping to see if bot is running
-		if m.Content == "!ping" {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "pong "+m.Author.Username)
-		}
-
-		if m.Content == "!meme" {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "https://memegen.link/buzz/memes/memes_everywhere.jpg")
-		}
+		prefixHandler(s, m)
 	}
 
 	//Rolls an n sided dice for user
-	if strings.HasPrefix(m.Content, "roll") {
-		strRoll := strings.Split(m.Content, " ")
+	if strings.HasPrefix(strings.ToLower(m.Content), "roll") {
+		rollHandler(s, m)
+	}
 
-		if len(strRoll) <= 1 {
+	//insult person
+	if strings.HasPrefix(strings.ToLower(m.Content), "insult") {
+		userID := ""
+		msg := strings.Split(m.Content, " ")
+		if len(msg) == 1 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "Possible people to insult: ")
+			var ppl []string
+			for k := range users {
+				ppl = append(ppl, k)
+				ppl = append(ppl, "\n")
+			}
+			pplMsg := strings.Join(ppl[:], "")
+			_, _ = s.ChannelMessageSend(m.ChannelID, pplMsg)
 			return
 		}
-		if n, err := strconv.Atoi(strRoll[1]); err == nil {
-			i := roll(n)
-			_, _ = s.ChannelMessageSend(m.ChannelID, m.Author.Username+" rolled a "+strconv.Itoa(i)+" on a "+strconv.Itoa(n)+" sided dice")
-			if i == 1 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, "lol "+m.Author.Mention()+" is a loser")
-			} else if i == n {
-				_, _ = s.ChannelMessageSend(m.ChannelID, m.Author.Mention()+" flippin nailed it")
+		for k, v := range users {
+			if msg[1] == k {
+				userID = v
 			}
+		}
+		if userID != "" {
+			insult := insult.Insult()
+			user, _ := s.User(userID)
+			_, _ = s.ChannelMessageSend(m.ChannelID, user.Mention()+" "+insult)
 		}
 	}
 
@@ -122,9 +131,41 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 }
 
-func help() string {
-	return "!ping - command to check if bot is active\nroll n - rolls an n sided dice for user\nyes/no/maybe - sends a gif based on command\n ? - sends random yes no maybe answer"
+func prefixHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Content == "!help" {
+		_, _ = s.ChannelMessageSend(m.ChannelID, help())
+	}
 
+	if m.Content == "!meme" {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "https://memegen.link/buzz/memes/memes_everywhere.jpg")
+	}
+}
+
+func rollHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	strRoll := strings.Split(m.Content, " ")
+	var i int
+	var n int
+	var err error
+
+	if len(strRoll) == 1 {
+		n = 20
+		i = roll(n)
+	} else if n, err = strconv.Atoi(strRoll[1]); err == nil {
+		i = roll(n)
+	} else {
+		return
+	}
+
+	_, _ = s.ChannelMessageSend(m.ChannelID, m.Author.Username+" rolled a "+strconv.Itoa(i)+" on a "+strconv.Itoa(n)+" sided dice")
+	if i == 1 {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "lol "+m.Author.Mention()+" is a loser")
+	} else if i == n {
+		_, _ = s.ChannelMessageSend(m.ChannelID, m.Author.Mention()+" flippin nailed it")
+	}
+}
+
+func help() string {
+	return "roll n - rolls an n sided dice for user\nyes/no/maybe - sends a gif based on command\n ? - sends random yes no maybe answer"
 }
 
 //roll an n sided dice
