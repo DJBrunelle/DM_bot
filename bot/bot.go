@@ -74,12 +74,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "insult norlando" {
-		nolan, _ := s.User(users["nolan"])
-		_, _ = s.ChannelMessageSend(m.ChannelID, nolan.Mention()+" is a nolan")
-		return
-	}
-
 	if m.Content == "bot status" {
 		if active {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "On")
@@ -102,6 +96,12 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if active == false {
+		return
+	}
+
+	if m.Content == "insult norlando" {
+		nolan, _ := s.User(users["nolan"])
+		_, _ = s.ChannelMessageSend(m.ChannelID, nolan.Mention()+" is a nolan")
 		return
 	}
 
