@@ -115,28 +115,39 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "poof" {
+	if strings.ToLower(m.Content) == "poofer" {
 		dog := doggo.Doggo("pomeranian")
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "boof" {
-		r := rand.Intn(1)
+	if strings.ToLower(m.Content) == "boofer" {
+		r := rand.Intn(3)
 		var dog string
-		if r == 1 {
+		if r == 0 {
 			dog = doggo.Doggo("stbernard")
-		} else {
+		} else if r == 1 {
 			dog = doggo.Doggo("husky")
+		} else if r == 2 {
+			dog = doggo.Doggo("eskimo")
 		}
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "bork" {
-		dog := doggo.Doggo("rottweiler")
+	if strings.ToLower(m.Content) == "borker" {
+		r := rand.Intn(3)
+		var dog string
+		if r == 0 {
+			dog = doggo.Doggo("rottweiler")
+		} else if r == 1 {
+			dog = doggo.Doggo("germanshepherd")
+		} else if r == 2 {
+			dog = doggo.Doggo("doberman")
+		}
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "pup" {
+
+	if strings.ToLower(m.Content) == "pupper" {
 		r := rand.Intn(4)
 		var dog string
 		if r == 0 {
