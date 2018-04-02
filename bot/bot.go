@@ -2,6 +2,7 @@ package bot
 
 import (
 	"DM_bot/api/answer"
+	"DM_bot/api/doggo"
 	"DM_bot/api/insult"
 	"DM_bot/config"
 	"fmt"
@@ -73,6 +74,12 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if m.Content == "insult norlando" {
+		nolan, _ := s.User(users["nolan"])
+		_, _ = s.ChannelMessageSend(m.ChannelID, nolan.Mention()+" is a nolan")
+		return
+	}
+
 	if m.Content == "bot status" {
 		if active {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "On")
@@ -98,6 +105,11 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if strings.ToLower(m.Content) == "doggo" {
+		dog := doggo.Doggo()
+		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+	}
+
 	//Static bot responses
 	if strings.HasPrefix(m.Content, config.BotPrefix) {
 		prefixHandler(s, m)
@@ -113,7 +125,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//insult person
 	if strings.HasPrefix(strings.ToLower(m.Content), "insult") {
 		userID := ""
-		msg := strings.Split(m.Content, " ")
+		msg := strings.Split(strings.ToLower(m.Content), " ")
 		if len(msg) == 1 {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "Possible people to insult: ")
 			var ppl []string
