@@ -19,6 +19,14 @@ var yesOrNoVal *yesNoStruct
 
 const nolan = "GutsmansAss"
 const daniel = "iel"
+const cel = "Firefly"
+const derek = "Derek"
+const nino = "Fajitasforme"
+const han = "beardo"
+const sarah = "Sarah"
+const twysper = "Twysper"
+const david = "Alucard1557"
+const benji = "( ͡ ° ͜ ʖ ͡ ° )"
 
 type yesNoStruct struct {
 	Answer string `json:"answer"`
