@@ -250,6 +250,9 @@ func rollHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		n = 20
 		i = roll(n)
 	} else if n, err = strconv.Atoi(strRoll[1]); err == nil {
+		if n <= 0 {
+			return
+		}
 		i = roll(n)
 	} else {
 		return
