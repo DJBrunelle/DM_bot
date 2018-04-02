@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	active     bool
 	botID      string
 	goBot      *discordgo.Session
 	yesOrNoVal *yesNoStruct
@@ -38,6 +39,7 @@ type yesNoStruct struct {
 
 //Start runs the gobot
 func Start() {
+	active = true
 	goBot, err := discordgo.New("Bot " + config.Token)
 
 	if err != nil {
@@ -71,14 +73,41 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if m.Content == "bot status" {
+		if active {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "On")
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "Off")
+		}
+
+		return
+	}
+
+	if m.Content == "bot off" && active {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Shutting off...")
+		active = false
+		return
+	}
+	if m.Content == "bot on" && !active {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Turning on...")
+		active = true
+		return
+	}
+
+	if active == false {
+		return
+	}
+
 	//Static bot responses
 	if strings.HasPrefix(m.Content, config.BotPrefix) {
 		prefixHandler(s, m)
+		return
 	}
 
 	//Rolls an n sided dice for user
 	if strings.HasPrefix(strings.ToLower(m.Content), "roll") {
 		rollHandler(s, m)
+		return
 	}
 
 	//insult person
@@ -106,27 +135,32 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			user, _ := s.User(userID)
 			_, _ = s.ChannelMessageSend(m.ChannelID, user.Mention()+" "+insult)
 		}
+		return
 	}
 
 	if strings.HasSuffix(m.Content, "?") {
 		answer, image := answer.YesNoMaybe()
 		_, _ = s.ChannelMessageSend(m.ChannelID, answer)
 		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+		return
 	}
 
-	if strings.Contains(strings.ToLower(m.Content), "yes") || strings.Contains(strings.ToLower(m.Content), "ya") {
+	if strings.HasPrefix(strings.ToLower(m.Content), "yes") || strings.HasPrefix(strings.ToLower(m.Content), "ya") {
 		image := answer.Yes()
 		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+		return
 	}
 
-	if strings.Contains(strings.ToLower(m.Content), "no") || strings.Contains(strings.ToLower(m.Content), "nah") {
+	if strings.HasPrefix(strings.ToLower(m.Content), "no") || strings.HasPrefix(strings.ToLower(m.Content), "nah") {
 		image := answer.No()
 		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+		return
 	}
 
 	if strings.Contains(strings.ToLower(m.Content), "maybe") {
 		image := answer.Maybe()
 		_, _ = s.ChannelMessageSend(m.ChannelID, image)
+		return
 	}
 
 }
@@ -165,7 +199,7 @@ func rollHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func help() string {
-	return "roll n - rolls an n sided dice for user\nyes/no/maybe - sends a gif based on command\n ? - sends random yes no maybe answer"
+	return "bot status - indicates whether bot is on or off\nbot on/off - turns bot on or off\ninsult <name> - insults person\nroll n - rolls an n sided dice for user\nyes/no/maybe - sends a gif based on command\n ? - sends random yes no maybe answer"
 }
 
 //roll an n sided dice
