@@ -106,8 +106,50 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if strings.ToLower(m.Content) == "doggo" {
-		dog := doggo.Doggo()
+		dog := doggo.Doggo("")
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+		return
+	}
+	if strings.ToLower(m.Content) == "shibe" {
+		dog := doggo.Doggo("shiba")
+		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+		return
+	}
+	if strings.ToLower(m.Content) == "poof" {
+		dog := doggo.Doggo("pomeranian")
+		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+		return
+	}
+	if strings.ToLower(m.Content) == "boof" {
+		r := rand.Intn(1)
+		var dog string
+		if r == 1 {
+			dog = doggo.Doggo("stbernard")
+		} else {
+			dog = doggo.Doggo("husky")
+		}
+		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+		return
+	}
+	if strings.ToLower(m.Content) == "bork" {
+		dog := doggo.Doggo("rottweiler")
+		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+		return
+	}
+	if strings.ToLower(m.Content) == "pup" {
+		r := rand.Intn(4)
+		var dog string
+		if r == 0 {
+			dog = doggo.Doggo("papillon")
+		} else if r == 1 {
+			dog = doggo.Doggo("pomeranian")
+		} else if r == 2 {
+			dog = doggo.Doggo("pekinese")
+		} else if r == 3 {
+			dog = doggo.Doggo("poodle/miniature")
+		}
+		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+		return
 	}
 
 	//Static bot responses

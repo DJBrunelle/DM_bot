@@ -12,9 +12,14 @@ type doggoStruct struct {
 }
 
 //Doggo returns a URL linking to a pic of a doggo
-func Doggo() string {
-	response, err := http.Get("https://dog.ceo/api/breeds/image/random")
-
+func Doggo(breed string) string {
+	var response *http.Response
+	var err error
+	if breed == "" {
+		response, err = http.Get("https://dog.ceo/api/breeds/image/random")
+	} else {
+		response, err = http.Get("https://dog.ceo/api/breed/" + breed + "/images/random")
+	}
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
 		return ""
@@ -26,8 +31,6 @@ func Doggo() string {
 
 	//update answer with json
 	err = json.Unmarshal(data, &doggo)
-
-	fmt.Println(doggo.URL)
 
 	return doggo.URL
 }
