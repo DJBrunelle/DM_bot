@@ -4,6 +4,7 @@ import (
 	"DM_bot/api/answer"
 	"DM_bot/api/doggo"
 	"DM_bot/api/insult"
+	"DM_bot/api/kitty"
 	"DM_bot/config"
 	"fmt"
 	"math/rand"
@@ -160,6 +161,12 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			dog = doggo.Doggo("poodle/miniature")
 		}
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
+		return
+	}
+
+	if strings.ToLower(m.Content) == "kitty" {
+		kitty := kitty.Kitty()
+		_, _ = s.ChannelMessageSend(m.ChannelID, kitty)
 		return
 	}
 
