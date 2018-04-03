@@ -32,6 +32,7 @@ var (
 		"benji":   "90968733580820480",
 		"shawn":   "122520927689900033",
 	}
+	channelActive map[string]bool
 )
 
 type yesNoStruct struct {
@@ -41,6 +42,7 @@ type yesNoStruct struct {
 
 //Start runs the gobot
 func Start() {
+	channelActive = make(map[string]bool)
 	active = true
 	goBot, err := discordgo.New("Bot " + config.Token)
 
@@ -71,12 +73,17 @@ func Start() {
 
 //MessageHandler listens for messages sent in discord chat
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+
 	if m.Author.ID == botID {
 		return
 	}
 
+	if _, ok := channelActive[m.ChannelID]; !ok {
+		channelActive[m.ChannelID] = true
+	}
+
 	if m.Content == "bot status" {
-		if active {
+		if channelActive[m.ChannelID] {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "On")
 		} else {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "Off")
@@ -85,18 +92,28 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "bot off" && active {
+	if m.Content == "bot off" {
+		if !channelActive[m.ChannelID] {
+			return
+		}
+
+		channelActive[m.ChannelID] = false
 		_, _ = s.ChannelMessageSend(m.ChannelID, "Shutting off...")
-		active = false
+
 		return
 	}
-	if m.Content == "bot on" && !active {
+	if m.Content == "bot on" {
+		if channelActive[m.ChannelID] {
+			return
+		}
+
+		channelActive[m.ChannelID] = true
 		_, _ = s.ChannelMessageSend(m.ChannelID, "Turning on...")
-		active = true
+
 		return
 	}
 
-	if active == false {
+	if !channelActive[m.ChannelID] {
 		return
 	}
 
@@ -106,22 +123,22 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.ToLower(m.Content) == "doggo" {
+	if strings.Contains(strings.ToLower(m.Content), "doggo") {
 		dog := doggo.Doggo("")
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "shibe" {
+	if strings.Contains(strings.ToLower(m.Content), "shibe") {
 		dog := doggo.Doggo("shiba")
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "poofer" {
+	if strings.Contains(strings.ToLower(m.Content), "poof") {
 		dog := doggo.Doggo("pomeranian")
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "boofer" {
+	if strings.Contains(strings.ToLower(m.Content), "boof") {
 		r := rand.Intn(3)
 		var dog string
 		if r == 0 {
@@ -134,7 +151,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
 	}
-	if strings.ToLower(m.Content) == "borker" {
+	if strings.Contains(strings.ToLower(m.Content), "bork") {
 		r := rand.Intn(3)
 		var dog string
 		if r == 0 {
@@ -148,7 +165,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.ToLower(m.Content) == "pupper" {
+	if strings.Contains(strings.ToLower(m.Content), "pup") {
 		r := rand.Intn(4)
 		var dog string
 		if r == 0 {
@@ -164,7 +181,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.ToLower(m.Content) == "kitty" {
+	if strings.Contains(strings.ToLower(m.Content), "kitty") {
 		kitty := kitty.Kitty()
 		_, _ = s.ChannelMessageSend(m.ChannelID, kitty)
 		return
