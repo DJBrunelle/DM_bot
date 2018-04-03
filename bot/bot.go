@@ -71,7 +71,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if _, ok := channelActive[m.ChannelID]; !ok {
-		channelActive[m.ChannelID] = true
+		channelActive[m.ChannelID] = false //Defaults the bot to off
 	}
 
 	if m.Content == "bot status" {
