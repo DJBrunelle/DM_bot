@@ -15,11 +15,9 @@ import (
 )
 
 var (
-	active     bool
-	botID      string
-	goBot      *discordgo.Session
-	yesOrNoVal *yesNoStruct
-	users      = map[string]string{
+	botID string
+	goBot *discordgo.Session
+	users = map[string]string{
 		"nolan":   "135923889795497984",
 		"daniel":  "196128092874342401",
 		"cel":     "92086825551687680",
@@ -35,15 +33,9 @@ var (
 	channelActive map[string]bool
 )
 
-type yesNoStruct struct {
-	Answer string `json:"answer"`
-	Image  string `json:"image"`
-}
-
 //Start runs the gobot
 func Start() {
 	channelActive = make(map[string]bool)
-	active = true
 	goBot, err := discordgo.New("Bot " + config.Token)
 
 	if err != nil {
