@@ -74,7 +74,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		channelActive[m.ChannelID] = false //Defaults the bot to off
 	}
 
-	if m.Content == "bot status" {
+	if strings.ToLower(m.Content) == "bot status" {
 		if channelActive[m.ChannelID] {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "On")
 		} else {
@@ -84,7 +84,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "bot off" {
+	if strings.ToLower(m.Content) == "bot off" {
 		if !channelActive[m.ChannelID] {
 			return
 		}
@@ -94,7 +94,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		return
 	}
-	if m.Content == "bot on" {
+	if strings.ToLower(m.Content) == "bot on" {
 		if channelActive[m.ChannelID] {
 			return
 		}
@@ -109,13 +109,13 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "insult norlando" {
+	if strings.ToLower(m.Content) == "insult norlando" {
 		nolan, _ := s.User(users["nolan"])
 		_, _ = s.ChannelMessageSend(m.ChannelID, nolan.Mention()+" is a nolan")
 		return
 	}
 
-	if strings.Contains(strings.ToLower(m.Content), "doggo") {
+	if strings.Contains(strings.ToLower(m.Content), "dog") {
 		dog := doggo.Doggo("")
 		_, _ = s.ChannelMessageSend(m.ChannelID, dog)
 		return
