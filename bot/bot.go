@@ -14,6 +14,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+//commment
 var (
 	botID string
 	goBot *discordgo.Session
